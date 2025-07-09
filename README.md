@@ -1,8 +1,24 @@
 # Hyprland Setup Guide (Arch-based)
 
-A straightforward guide to set up a functional and minimal Hyprland desktop environment on Arch-based systems.
+A minimal and functional Hyprland desktop setup for Arch-based distributions.
 
-## 1. Install AUR Helper (`yay`)
+### Table of Contents
+
+- [AUR Helper (yay)](#aur-helper-yay)
+- [Install Hyprland & Essential Packages](#install-hyprland--essential-packages)
+- [Install AUR Packages](#install-aur-packages)
+- [Apply Dotfiles](#apply-dotfiles)
+- [ZSH with ZimFW](#zsh-with-zimfw)
+- [Neovim with LazyVim](#neovim-with-lazyvim)
+- [NVM & PNPM Setup](#nvm--pnpm-setup)
+- [Git Setup](#git-setup)
+- [Docker Setup](#docker-setup)
+- [QEMU/KVM Virtualization](#qemukvm-virtualization)
+- [Power Management](#power-management)
+
+---
+
+## AUR Helper (yay)
 
 ```bash
 sudo pacman -S --needed git base-devel
@@ -12,53 +28,21 @@ cd yay && makepkg -si
 
 ---
 
-## 2. Install Hyprland and Core Packages
+## Install Hyprland & Essential Packages
 
 ```bash
 sudo pacman -S --needed \
-  alacritty \
-  bluez \
-  blueman \
-  brightnessctl \
-  cliphist \
-  fd \
-  firefox \
-  fzf \
-  grim \
-  hyprland \
-  hyprpaper \
-  hyprshot \
-  kitty \
-  ly \
-  mpv \
-  nemo \
-  nwg-look \
-  pipewire \
-  pipewire-alsa \
-  pipewire-audio \
-  pipewire-jack \
-  pipewire-pulse \
-  playerctl \
-  ripgrep \
-  slurp \
-  swaybg \
-  swayidle \
-  tmux \
-  tlp \
-  ttf-font-awesome \
-  ttf-jetbrains-mono-nerd \
-  waybar \
-  wf-recorder \
-  wireplumber \
-  wl-clipboard \
-  wofi \
-  xdg-desktop-portal-hyprland \
-  stow
+  bluez blueman brightnessctl cliphist fd firefox fzf grim hyprland \
+  hyprpaper hyprshot kitty ly mpv nemo nwg-look pipewire pipewire-alsa \
+  pipewire-audio pipewire-jack pipewire-pulse playerctl ripgrep slurp \
+  tmux tlp ttf-font-awesome ttf-jetbrains-mono-nerd waybar \
+  wf-recorder wireplumber wl-clipboard wofi xdg-desktop-portal-hyprland \
+  stow zsh
 ```
 
 ---
 
-## 3. Install Additional AUR Packages
+## Install AUR Packages
 
 ```bash
 yay -S waylogout-git neovim-git wifi-qr
@@ -66,51 +50,86 @@ yay -S waylogout-git neovim-git wifi-qr
 
 ---
 
-## 4. Power Management
-
-### Enable TLP
+## Apply Dotfiles
 
 ```bash
-sudo systemctl enable --now tlp.service
-```
-
-### Auto Suspend on Low Battery (5%)
-
-Create a rule:
-
-```bash
-sudo nano /etc/udev/rules.d/99-lowbat.rules
-```
-
-Paste:
-
-```bash
-SUBSYSTEM=="power_supply", ATTR{status}=="Discharging", ATTR{capacity}=="[0-5]", RUN+="/usr/bin/systemctl suspend"
+git clone https://github.com/dracu-lah/hyprdots ~/hyprdots
+cd ~/hyprdots
+stow .
 ```
 
 ---
 
-## 5. QEMU/KVM Virtualization Setup
+## ZSH with ZimFW
 
-Reference: [christitus.com](https://christitus.com/setup-qemu-in-archlinux/)
-
-### Install Required Packages
+[zimfw.sh](https://zimfw.sh/)
 
 ```bash
-sudo pacman -S --needed \
-  qemu \
-  virt-manager \
-  virt-viewer \
-  dnsmasq \
-  vde2 \
-  bridge-utils \
-  openbsd-netcat \
-  ebtables \
-  iptables \
-  libguestfs
+chsh -s /bin/zsh
+curl -fsSL https://raw.githubusercontent.com/zimfw/install/master/install.zsh | zsh
 ```
 
-### Configure libvirt
+---
+
+## Neovim with LazyVim
+
+[lazyvim.org](https://www.lazyvim.org/installation)
+
+```bash
+mv ~/.config/nvim{,.bak}
+git clone https://github.com/LazyVim/starter ~/.config/nvim
+rm -rf ~/.config/nvim/.git
+nvim
+```
+
+---
+
+## NVM & PNPM Setup
+
+[nvm-sh](https://github.com/nvm-sh/nvm)
+
+```bash
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+curl -fsSL https://get.pnpm.io/install.sh | sh -
+```
+
+---
+
+## Git Setup
+
+[GitHub SSH Setup](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent#generating-a-new-ssh-key)
+
+```bash
+git config --global user.email "nevilnicks4321@gmail.com"
+git config --global user.name "dracu-lah"
+ssh-keygen -t ed25519 -C "nevilnicks4321@gmail.com"
+cat ~/.ssh/id_ed25519.pub | wl-copy
+```
+
+---
+
+## Docker Setup
+
+[itsfoss.com](https://itsfoss.com/install-docker-arch-linux/)
+
+```bash
+sudo pacman -S --needed docker docker-compose
+sudo systemctl start docker.service
+sudo systemctl enable docker.service
+sudo usermod -aG docker $USER
+newgrp docker
+```
+
+---
+
+## QEMU/KVM Virtualization
+
+[christitus.com](https://christitus.com/setup-qemu-in-archlinux/)
+
+```bash
+sudo pacman -S --needed qemu virt-manager virt-viewer dnsmasq vde2 \
+  bridge-utils openbsd-netcat ebtables iptables libguestfs
+```
 
 Edit config:
 
@@ -118,21 +137,21 @@ Edit config:
 sudo nano /etc/libvirt/libvirtd.conf
 ```
 
-Set:
+Add:
 
 ```conf
 unix_sock_group = "libvirt"
 unix_sock_rw_perms = "0770"
 ```
 
-Add your user:
+Add user:
 
 ```bash
 sudo usermod -aG libvirt $(whoami)
 newgrp libvirt
 ```
 
-Reboot, then run:
+Reboot and run:
 
 ```bash
 virt-manager
@@ -140,12 +159,17 @@ virt-manager
 
 ---
 
-## 6. Apply Dotfiles
+## Power Management
 
-Clone and apply using `stow`:
+Enable TLP:
 
 ```bash
-git clone https://github.com/dracu-lah/hyprdots ~/hyprdots
-cd ~/hyprdots
-stow .
+sudo systemctl enable --now tlp.service
+```
+
+Auto suspend on low battery:
+in /etc/udev/rules.d/99-lowbat.rules
+
+```bash
+SUBSYSTEM=="power_supply", ATTR{status}=="Discharging", ATTR{capacity}=="[0-5]", RUN+="/usr/bin/systemctl suspend"
 ```
