@@ -37,7 +37,7 @@ sudo pacman -S --needed \
   pipewire-audio pipewire-jack pipewire-pulse playerctl ripgrep slurp \
   tmux tlp ttf-font-awesome ttf-jetbrains-mono-nerd waybar \
   wf-recorder wireplumber wl-clipboard wofi xdg-desktop-portal-hyprland \
-  stow zsh sway
+  stow zsh sway swaylock swaybg swayidle
 ```
 
 ---
