@@ -300,9 +300,9 @@ for_window [app_id="zenity"] floating enable;
 # Autolaunch
 exec {
   copyq
+  wl-paste --type text --watch cliphist store
+  wl-paste --type image --watch cliphist store
 }
 
-exec-once  wl-paste --type text --watch cliphist store
-exec-once  wl-paste --type image --watch cliphist store
 
 include /etc/sway/config.d/*
